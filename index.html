@@ -1,46 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sorteo</title>
+    <title>Sorteo LauraFloresCiencia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
     <style>
 
-        .container {
-            max-width: 600px;
-        }
-
         body {
+            font-family: 'Roboto Condensed', sans-serif;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            background-image: url('bg.jpg');
+            background-size: cover;
             align-items: center;
+            align-content: center;
+            height: 100vh;
         }
 
+        .container {
+            max-width: 600px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding-bottom: 20vh
+        }
+      
         h1 {
             text-align: center;
+            color: #fff;
         }
 
         #nombres {
-            width: 100%;
-            font-size: 1.5em;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            background: white;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px 4px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
         }
 
-        #sorteo {
-            width: 100%;
+        #nombres:focus {
+            box-shadow: 0 0 20px 3px rgba(102, 51, 153, 0.4), 0 0 20px 3px rgba(37, 117, 252, 0.4);
         }
+
+        #nombres.girando {
+            animation: girar 2s infinite;
+        }
+
+        @keyframes girar {
+            0% {box-shadow: 0 0 20px 3px rgba(102, 51, 153, 0.4);} /* morado */
+            25% {box-shadow: 0 0 20px 3px rgba(37, 117, 252, 0.4);} /* azul */
+            50% {box-shadow: 0 0 20px 3px rgba(0, 255, 0, 0.4);} /* verde */
+            75% {box-shadow: 0 0 20px 3px rgba(255, 0, 0, 0.4);} /* rojo */
+            100% {box-shadow: 0 0 20px 3px rgba(102, 51, 153, 0.4);} /* morado */
+        }
+
+
+
+
 
         #resultado {
+            width: 100%;
             text-align: center;
             font-size: 2em;
             margin-top: 20px;
         }
 
         #suplente {
+            width: 100%;
             text-align: center;
             font-size: 1em;
             margin-top: 20px;
         }
+        #sorteo {
+            background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 12px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #sorteo:hover {
+            background: linear-gradient(to right, #2575fc 0%, #6a11cb 100%);
+            color: white;
+        }
+
     </style>
 </head>
 <body>
@@ -53,34 +114,34 @@
     </div>
 
     <script>
-    $(document).ready(function(){
-        $('#sorteo').click(function(){
-            var nombres = $('#nombres').val().split('\n');
-            $.post('sorteo.php', {nombres: nombres}, function(data) {
-                var ganador = data.ganador;
-                var suplente = data.suplente;
+        $(document).ready(function(){
+            $('#sorteo').click(function(){
+                $('#nombres').addClass('girando'); // Añade la clase 'girando' al iniciar el sorteo
+                var nombres = $('#nombres').val().split('\n');
+                $.post('sorteo.php', {nombres: nombres}, function(data) {
+                    var ganador = data.ganador;
+                    var suplente = data.suplente;
 
-                var i = 0;
-                var intervalo = setInterval(function() {
-                    nombres.sort(() => Math.random() - 0.5); // Mezcla los nombres
-                    $('#resultado').text(nombres[i % nombres.length]);
-                    $('#suplente').text(nombres[(i+1) % nombres.length]); // Muestra el suplente de manera aleatoria
-                    i++;
-                    if (i > 100) {
-                        clearInterval(intervalo);
-                        $('#resultado').fadeOut(500, function() {
-                            $(this).text("El ganador es: " + ganador).fadeIn(500);
-                        });
-                        $('#suplente').fadeOut(500, function() {
-                            $(this).text("El suplente es: " + suplente).fadeIn(500); // Muestra el suplente definitivo
-                        });
-                    }
-                }, 100);
-            }, 'json');
+                    var i = 0;
+                    var intervalo = setInterval(function() {
+                        nombres.sort(() => Math.random() - 0.5); // Mezcla los nombres
+                        $('#resultado').text(nombres[i % nombres.length]);
+                        $('#suplente').text(nombres[(i+1) % nombres.length]); // Muestra el suplente de manera aleatoria
+                        i++;
+                        if (i > 100) {
+                            clearInterval(intervalo);
+                            $('#nombres').removeClass('girando'); // Quita la clase 'girando' al finalizar el sorteo
+                            $('#resultado').fadeOut(500, function() {
+                                $(this).text("El ganador es: " + ganador).fadeIn(500);
+                            });
+                            $('#suplente').fadeOut(500, function() {
+                                $(this).text("El suplente es: " + suplente).fadeIn(500); // Muestra el suplente definitivo
+                            });
+                        }
+                    }, 100);
+                }, 'json');
+            });
         });
-    });
-
-
     </script>
 </body>
 </html>
