@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sorteo</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+
+        .container {
+            max-width: 600px;
+        }
+
+        body {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #nombres {
+            width: 100%;
+            font-size: 1.5em;
+        }
+
+        #sorteo {
+            width: 100%;
+        }
+
+        #resultado {
+            text-align: center;
+            font-size: 2em;
+            margin-top: 20px;
+        }
+
+        #suplente {
+            text-align: center;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sorteador de la ciencia</h1>
+        <textarea id="nombres" rows="25" cols="50"></textarea>
+        <button id="sorteo">Realizar sorteo</button>
+        <div id="resultado"></div>
+        <div id="suplente"></div> <!-- Nuevo div para el suplente -->
+    </div>
+
+    <script>
+    $(document).ready(function(){
+        $('#sorteo').click(function(){
+            var nombres = $('#nombres').val().split('\n');
+            $.post('sorteo.php', {nombres: nombres}, function(data) {
+                var ganador = data.ganador;
+                var suplente = data.suplente;
+
+                var i = 0;
+                var intervalo = setInterval(function() {
+                    nombres.sort(() => Math.random() - 0.5); // Mezcla los nombres
+                    $('#resultado').text(nombres[i % nombres.length]);
+                    $('#suplente').text(nombres[(i+1) % nombres.length]); // Muestra el suplente de manera aleatoria
+                    i++;
+                    if (i > 100) {
+                        clearInterval(intervalo);
+                        $('#resultado').fadeOut(500, function() {
+                            $(this).text("El ganador es: " + ganador).fadeIn(500);
+                        });
+                        $('#suplente').fadeOut(500, function() {
+                            $(this).text("El suplente es: " + suplente).fadeIn(500); // Muestra el suplente definitivo
+                        });
+                    }
+                }, 100);
+            }, 'json');
+        });
+    });
+
+
+    </script>
+</body>
+</html>
